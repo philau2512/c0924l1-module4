@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="../layout::head">
+    <title>View Product</title>
+</head>
+<body>
+<h3>View Product</h3>
+<p>
+    <a th:href="@{/product/list}">Back To List Product</a>
+</p>
+
+<div id="details">
+    <div class="product-detail">
+        <label>Name Product: </label>
+        <span th:text="${product.name}"></span>
+    </div>
+    <div class="product-detail">
+        <label>Price Product: </label>
+        <span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}"></span>
+    </div>
+    <div class="product-detail">
+        <label>Description Product: </label>
+        <span th:text="${product.description}"></span>
+    </div>
+    <div class="product-detail">
+        <label>Manufacturer Product: </label>
+        <span th:text="${product.manufacturer}"></span>
+    </div>
+</div>
+</body>
+</html>
