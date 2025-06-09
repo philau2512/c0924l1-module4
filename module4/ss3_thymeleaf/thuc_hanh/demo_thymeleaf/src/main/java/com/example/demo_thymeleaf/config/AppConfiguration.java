@@ -1,4 +1,4 @@
-package com.example.customermanagementthymeleaf.config;
+package com.example.demo_thymeleaf.config;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
