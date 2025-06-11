@@ -1,6 +1,7 @@
 package com.codegym.demo_spring_jpa.controller;
 
 import com.codegym.demo_spring_jpa.dto.StudentDto;
+import com.codegym.demo_spring_jpa.exception.DuplicateAdminName;
 import com.codegym.demo_spring_jpa.model.Student;
 import com.codegym.demo_spring_jpa.service.IClassService;
 import com.codegym.demo_spring_jpa.service.IStudentService;
@@ -49,7 +50,7 @@ public class StudentController {
     @PostMapping("/add")
     public String save(@Valid @ModelAttribute StudentDto studentDto, BindingResult bindingResult,
                        RedirectAttributes redirectAttributes,
-                       Model model){
+                       Model model) throws DuplicateAdminName {
         // Custom validate thì cần làm:
         new StudentDto().validate(studentDto,bindingResult);
 
@@ -59,6 +60,7 @@ public class StudentController {
         }
 
         Student student = new Student();
+        // copy thuộc tính của studentDto => student (entiy)
         BeanUtils.copyProperties(studentDto, student);
 
         studentService.add(student);
@@ -68,6 +70,7 @@ public class StudentController {
 
     @GetMapping("/detail")
     public String detail1(@RequestParam int id, Model model){
+        System.out.println(12/0);
         // gọi service
         Student student = studentService.findById(id);
         model.addAttribute("student",student);
@@ -79,5 +82,10 @@ public class StudentController {
         Student student = studentService.findById(id);
         model.addAttribute("student",student);
         return "students/detail";
+    }
+
+    @ExceptionHandler(DuplicateAdminName.class)
+    public String handleException(){
+        return "admin-duplicate";
     }
 }
