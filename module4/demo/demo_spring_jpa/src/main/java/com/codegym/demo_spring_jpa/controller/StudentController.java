@@ -1,8 +1,11 @@
 package com.codegym.demo_spring_jpa.controller;
 
+import com.codegym.demo_spring_jpa.dto.StudentDto;
 import com.codegym.demo_spring_jpa.model.Student;
 import com.codegym.demo_spring_jpa.service.IClassService;
 import com.codegym.demo_spring_jpa.service.IStudentService;
+import jakarta.validation.Valid;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -37,13 +41,25 @@ public class StudentController {
 
     @GetMapping("/add")
     public String showFormAdd(Model model){
-        model.addAttribute("student", new Student());
+        model.addAttribute("studentDto", new StudentDto());
         model.addAttribute("classList", classService.findAll());
         return "students/add";
     }
 
     @PostMapping("/add")
-    public String save(@ModelAttribute Student student, RedirectAttributes redirectAttributes){
+    public String save(@Valid @ModelAttribute StudentDto studentDto, BindingResult bindingResult,
+                       RedirectAttributes redirectAttributes,
+                       Model model){
+        // Custom validate thì cần làm:
+        new StudentDto().validate(studentDto,bindingResult);
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("classList", classService.findAll());
+            return "students/add";
+        }
+
+        Student student = new Student();
+        BeanUtils.copyProperties(studentDto, student);
 
         studentService.add(student);
         redirectAttributes.addFlashAttribute("mess","add success");

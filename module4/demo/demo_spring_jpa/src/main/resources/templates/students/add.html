@@ -7,12 +7,14 @@
 </head>
 <body>
 <th:block th:insert="~{/layout::navbar}"/>
-<form action="/students/add" method="post" th:object="${student}">
+<form action="/students/add" method="post" th:object="${studentDto}">
     <!--    <label>ID</label>-->
     <!--    <input th:field="*{id}">-->
     <br>
     <label>Name</label>
     <input th:field="*{name}">
+    <small style="color: red" th:if="${#fields.hasErrors()}" th:errors="*{name}"></small>
+    <br>
     <label>Gender</label>
     <input type="radio" th:field="*{gender}" th:value="1">Male
     <input type="radio" th:field="*{gender}" th:value="0">Female
