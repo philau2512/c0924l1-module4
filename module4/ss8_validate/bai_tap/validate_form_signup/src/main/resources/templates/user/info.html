@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thông tin người dùng</title>
+    <link rel="stylesheet" th:href="@{'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css'}">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">🎉 Xin chào <span th:text="${user.firstName}">Tên</span>!</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Họ tên:</strong> <span th:text="${user.firstName} + ' ' + ${user.lastName}"></span></p>
+                    <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+                    <p><strong>Số điện thoại:</strong> <span th:text="${user.phoneNumber}"></span></p>
+                    <p><strong>Tuổi:</strong> <span th:text="${user.age}"></span></p>
+
+                    <div class="mt-4 text-end">
+                        <a th:href="@{/user/logout}" class="btn btn-outline-danger">Đăng xuất</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
