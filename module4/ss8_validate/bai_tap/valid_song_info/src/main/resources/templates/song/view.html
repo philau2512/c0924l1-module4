@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết bài hát</title>
+</head>
+<body>
+<h2>🎧 Chi tiết bài hát</h2>
+<p><strong>Tiêu đề:</strong> <span th:text="${song.title}"></span></p>
+<p><strong>Tác giả:</strong> <span th:text="${song.artist}"></span></p>
+<p><strong>Thể loại:</strong> <span th:text="${song.genre}"></span></p>
+
+<a th:href="@{'/song/edit/' + ${song.id}}">✏️ Sửa bài hát</a> |
+<a th:href="@{'/song/add'}">➕ Thêm bài hát mới</a>
+</body>
+</html>
