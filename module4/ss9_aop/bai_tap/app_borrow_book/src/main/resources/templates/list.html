@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Danh sách sách</title>
+</head>
+<body>
+<h1>📚 Danh sách sách trong thư viện</h1>
+
+<table border="1" style="border-collapse: collapse">
+    <thead>
+    <tr>
+        <th>Tên sách</th>
+        <th>Số lượng còn</th>
+        <th>Thao tác</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book : ${books}">
+        <td th:text="${book.title}"></td>
+        <td th:text="${book.quantity}"></td>
+        <td><a th:href="@{/books/view/__${book.id}__}">Chi tiết</a></td>
+    </tr>
+    </tbody>
+</table>
+
+<hr>
+
+<h2>🔁 Trả sách</h2>
+<form action="/books/return" method="post">
+    <label for="code">Nhập mã mượn sách:</label>
+    <input type="text" name="code" id="code" required placeholder="VD: 04567" />
+    <button type="submit">Trả sách</button>
+</form>
+</body>
+</html>
