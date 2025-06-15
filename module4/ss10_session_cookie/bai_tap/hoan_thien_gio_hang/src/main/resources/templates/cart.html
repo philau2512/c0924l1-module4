@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Giỏ hàng</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<h2>🛒 GIỎ HÀNG CỦA BẠN</h2>
+
+<table border="1" cellpadding="8">
+    <thead>
+    <tr>
+        <th>Hình</th>
+        <th>Sản phẩm</th>
+        <th>Đơn giá</th>
+        <th>Số lượng</th>
+        <th>Thành tiền</th>
+        <th>Xóa</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${cartItems.values()}">
+        <td><img th:src="${item.product.imageUrl}" width="100"/></td>
+        <td>
+            <div th:text="${item.product.name}"></div>
+            <small th:text="${item.product.description}"></small>
+        </td>
+        <td th:text="${item.product.price} + ' đ'"></td>
+        <td>
+            <form th:action="@{/cart/update}" method="post">
+                <input type="hidden" name="id" th:value="${item.product.id}"/>
+                <input type="number" name="quantity" th:value="${item.quantity}" min="1" max="${item.product.stock}"/>
+                <button type="submit">Cập nhật</button>
+            </form>
+        </td>
+        <td th:text="${item.product.price * item.quantity} + ' đ'"></td>
+        <td><a th:href="@{/cart/remove/{id}(id=${item.product.id})}">❌</a></td>
+    </tr>
+
+    </tbody>
+</table>
+
+<h3>Tổng tiền: <span th:text="${total} + ' đ'"></span></h3>
+
+<form th:action="@{/checkout}" method="get">
+    <button type="submit">THANH TOÁN</button>
+</form>
+<a href="/products">← Tiếp tục mua hàng</a>
+</body>
+</html>
