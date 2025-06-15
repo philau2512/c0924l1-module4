@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'View Blog - ' + ${blog.title}">View Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .blog-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+        .blog-meta {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .blog-content {
+            white-space: pre-wrap;
+            line-height: 1.7;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="blog-container">
+        <h2 th:text="${blog.title}">Blog Title</h2>
+
+        <div class="blog-meta">
+            <span>By <strong th:text="${blog.author}">Author</strong></span> |
+            <span th:text="${#temporals.format(blog.createdDate, 'dd/MM/yyyy HH:mm')}">Created Date</span> |
+            <span>Category: <strong th:text="${blog.category.name}"></strong></span>
+        </div>
+
+        <div class="blog-content" th:text="${blog.content}">
+            Blog content goes here...
+        </div>
+
+        <div class="mt-4">
+            <a th:href="@{/blogs}" class="btn btn-secondary">← Back to Blogs List</a>
+            <a th:href="@{/blogs/edit/__${blog.id}__}" class="btn btn-warning text-white">Edit</a>
+            <button type="button"
+                    class="btn btn-danger btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteModal"
+                    th:data-blog-id="${blog.id}"
+                    th:data-blog-title="${blog.title}">
+                Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xác nhận Xoá -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="deleteForm" method="post">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete blog "<strong id="modalBlogTitle"></strong>"?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const deleteModal = document.getElementById('deleteModal');
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const blogId = button.getAttribute('data-blog-id');
+        const blogTitle = button.getAttribute('data-blog-title');
+
+        // Gán dữ liệu vào modal
+        document.getElementById('modalBlogTitle').textContent = blogTitle;
+
+        // Set form action
+        const form = document.getElementById('deleteForm');
+        form.action = '/blogs/delete/' + blogId; // Adjust the URL if needed
+    });
+</script>
+</body>
+</html>
