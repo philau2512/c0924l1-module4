@@ -63,7 +63,7 @@ public class StudentController {
         // copy thuộc tính của studentDto => student (entiy)
         BeanUtils.copyProperties(studentDto, student);
 
-        studentService.add(student);
+        studentService.save(student);
         redirectAttributes.addFlashAttribute("mess","add success");
         return "redirect:/students";
     }

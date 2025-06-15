@@ -25,12 +25,17 @@ public class StudentService implements IStudentService{
     }
 
     @Override
-    public void add(Student student) {
+    public void save(Student student) {
         studenRtepository.save(student);
     }
 
     @Override
     public Student findById(int id) {
         return studenRtepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public void deleteById(int id) {
+        studenRtepository.deleteById(id);
     }
 }
