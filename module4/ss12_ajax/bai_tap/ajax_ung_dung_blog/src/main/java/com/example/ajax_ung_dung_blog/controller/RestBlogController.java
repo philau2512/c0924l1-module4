@@ -1,6 +1,7 @@
 package com.example.ajax_ung_dung_blog.controller;
 
 import com.example.ajax_ung_dung_blog.config.ApiResponse;
+import com.example.ajax_ung_dung_blog.dto.BlogDTO;
 import com.example.ajax_ung_dung_blog.dto.CategoryDTO;
 import com.example.ajax_ung_dung_blog.model.Blog;
 import com.example.ajax_ung_dung_blog.model.Category;
@@ -47,44 +48,28 @@ public class RestBlogController {
         return new ResponseEntity<>(categoryDTOList, HttpStatus.OK);
     }
 
-    // --- Get blog list ---
-//    @GetMapping("")
-//    public ResponseEntity<List<Blog>> getBlogList() {
-//        List<Blog> blogList = blogService.findAll();
-//        if (blogList.isEmpty()) {
-//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//        }
-//        return new ResponseEntity<>(blogList, HttpStatus.OK);
-//    }
-
+    // --- Get blog list with pagination and search ---
     @GetMapping("")
-    public ResponseEntity<Page<Blog>> getBlogList(
+    public ResponseEntity<?> getBlogList(
             @RequestParam(required = false, defaultValue = "") String searchName,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "3") int size) {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdDate");
         Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Blog> blogPage = blogService.findAll(searchName, pageable);
 
-        try {
-            // Lấy trang các blog với tìm kiếm theo tên
-            Page<Blog> blogPage = blogService.findAll(searchName, pageable);
-
-            // Trả về response với status 200 (OK)
-            return new ResponseEntity<>(blogPage, HttpStatus.OK);
-        } catch (Exception e) {
-            // Nếu có lỗi, trả về status 500 (Internal Server Error)
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        if (blogPage.isEmpty()) {
+            return new ResponseEntity<>(new ApiResponse("No blogs found"), HttpStatus.NO_CONTENT);
         }
+        return new ResponseEntity<>(blogPage, HttpStatus.OK);
     }
 
-    // --- Xem danh sách các bài viết của một category ---
+    // --- Get blogs by category ---
     @GetMapping("/categories/{categoryId}")
-    public ResponseEntity<?> getBlogsByCategory(@org.springframework.web.bind.annotation.PathVariable Long categoryId) {
+    public ResponseEntity<?> getBlogsByCategory(@PathVariable Long categoryId) {
         Category category = categoryService.findById(categoryId);
 
         if (category == null) {
-//            Map<String, String> response = new HashMap<>();
-//            response.put("message", "ID category không tồn tại");
             return new ResponseEntity<>(new ApiResponse("ID category không tồn tại"), HttpStatus.NOT_FOUND);
         }
 
@@ -95,13 +80,64 @@ public class RestBlogController {
         return new ResponseEntity<>(blogList, HttpStatus.OK);
     }
 
-    // --- Xem chi tiết một bài viết ---
+    // --- Get blog by ID ---
     @GetMapping("/{id}")
-    public ResponseEntity<?> getBlogById(@org.springframework.web.bind.annotation.PathVariable Long id) {
+    public ResponseEntity<?> getBlogById(@PathVariable Long id) {
         Blog blog = blogService.findById(id);
         if (blog == null) {
             return new ResponseEntity<>(new ApiResponse("ID blog không tồn tại"), HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(blog, HttpStatus.OK);
+    }
+
+    // --- Create blog ---
+    @PostMapping("")
+    public ResponseEntity<?> createBlog(@RequestBody BlogDTO blogDTO) {
+        if (blogDTO.getTitle() == null || blogDTO.getContent() == null) {
+            return new ResponseEntity<>(new ApiResponse("Title and content are required"), HttpStatus.BAD_REQUEST);
+        }
+
+        Blog blog = new Blog();
+        BeanUtils.copyProperties(blogDTO, blog);
+        Category category = categoryService.findById(blogDTO.getCategoryId());
+        if (category == null) {
+            return new ResponseEntity<>(new ApiResponse("Invalid category ID"), HttpStatus.BAD_REQUEST);
+        }
+        blog.setCategory(category);
+        blogService.save(blog);
+        return new ResponseEntity<>(new ApiResponse("Blog created successfully"), HttpStatus.CREATED);
+    }
+
+    // --- Update blog ---
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateBlog(@PathVariable Long id, @RequestBody BlogDTO blogDTO) {
+        Blog existingBlog = blogService.findById(id);
+        if (existingBlog == null) {
+            return new ResponseEntity<>(new ApiResponse("ID blog không tồn tại"), HttpStatus.NOT_FOUND);
+        }
+
+        if (blogDTO.getTitle() == null || blogDTO.getContent() == null) {
+            return new ResponseEntity<>(new ApiResponse("Title and content are required"), HttpStatus.BAD_REQUEST);
+        }
+
+        BeanUtils.copyProperties(blogDTO, existingBlog);
+        Category category = categoryService.findById(blogDTO.getCategoryId());
+        if (category == null) {
+            return new ResponseEntity<>(new ApiResponse("Invalid category ID"), HttpStatus.BAD_REQUEST);
+        }
+        existingBlog.setCategory(category);
+        blogService.save(existingBlog);
+        return new ResponseEntity<>(new ApiResponse("Blog updated successfully"), HttpStatus.OK);
+    }
+
+    // --- Delete blog ---
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteBlog(@PathVariable Long id) {
+        Blog blog = blogService.findById(id);
+        if (blog == null) {
+            return new ResponseEntity<>(new ApiResponse("ID blog không tồn tại"), HttpStatus.NOT_FOUND);
+        }
+        blogService.delete(id);
+        return new ResponseEntity<>(new ApiResponse("Blog deleted successfully"), HttpStatus.OK);
     }
 }
