@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Blog</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+<h2>Edit Blog</h2>
+<form id="blogForm">
+    <label for="title">Title:</label>
+    <input type="text" id="title" required>
+
+    <label for="excerpt">Excerpt:</label>
+    <textarea id="excerpt"></textarea>
+
+    <label for="content">Content:</label>
+    <textarea id="content" required rows="10"></textarea>
+
+    <label for="author">Author:</label>
+    <input type="text" id="author">
+
+    <label for="categoryId">Category:</label>
+    <select id="categoryId" required>
+        <option value="">Select a category</option>
+    </select>
+
+    <button type="submit">Save</button>
+    <button type="button" onclick="window.location.href='index.html'">Cancel</button>
+</form>
+
+<script>
+    $(document).ready(function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const blogId = urlParams.get("id");
+
+        // Load categories
+        $.ajax({
+            dataType: "json",
+            url: "http://localhost:8080/api/v1/blogs/categories",
+            type: "GET",
+            success: function (data) {
+                let options = "<option value=''>Select a category</option>";
+                for (let category of data) {
+                    options += `<option value="${category.id}">${category.name}</option>`;
+                }
+                $("#categoryId").html(options);
+                loadBlog();
+            },
+            error: function () {
+                alert("Error loading categories");
+            }
+        });
+
+        // Load blog data
+        function loadBlog() {
+            $.ajax({
+                dataType: "json",
+                url: `http://localhost:8080/api/v1/blogs/${blogId}`,
+                type: "GET",
+                success: function (blog) {
+                    $("#title").val(blog.title);
+                    $("#excerpt").val(blog.excerpt);
+                    $("#content").val(blog.content);
+                    $("#author").val(blog.author);
+                    $("#categoryId").val(blog.category ? blog.category.id : "");
+                },
+                error: function () {
+                    alert("Error loading blog");
+                }
+            });
+        }
+
+        // Submit form
+        $("#blogForm").submit(function (e) {
+            e.preventDefault();
+            let blog = {
+                title: $("#title").val(),
+                excerpt: $("#excerpt").val(),
+                content: $("#content").val(),
+                author: $("#author").val(),
+                categoryId: $("#categoryId").val()
+            };
+
+            $.ajax({
+                url: `http://localhost:8080/api/v1/blogs/${blogId}`,
+                type: "PUT",
+                contentType: "application/json",
+                data: JSON.stringify(blog),
+                success: function () {
+                    alert("Blog updated successfully");
+                    window.location.href = "index.html";
+                },
+                error: function (res) {
+                    alert("Error updating blog: " + res.status);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
