@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/springsecurity">
 <head>
     <meta charset="UTF-8">
     <title>List Blogs</title>
@@ -49,7 +49,19 @@
 
 <div class="container">
     <h1 class="mb-4">📚 Blogs List</h1>
-    <a th:href="@{/blogs/create}" class="btn btn-primary mb-3">+ Write a new blog</a>
+
+    <div sec:authorize="isAuthenticated()">
+        <p>Welcome, <span sec:authentication="name"></span>!</p>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+
+    <div sec:authorize="!isAuthenticated()">
+        <a th:href="@{/blogs/create}">Login to create</a>
+    </div>
+
+    <div sec:authorize="isAuthenticated()">
+        <a th:href="@{/blogs/create}" class="btn btn-primary mb-3">+ Write a new blog</a>
+    </div>
 
     <form action="/blogs" method="get" class="row g-2 mb-4">
         <div class="col-md-10 col-sm-9">
